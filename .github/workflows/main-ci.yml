@@ -1,0 +1,15 @@
+on: push
+
+jobs: 
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Install Dependencies
+              run: |
+                stack update
+                stack install hlint
+            - name: hlint files
+              run:
+                hlint . -r
+   
+                
