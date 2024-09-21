@@ -1,15 +1,18 @@
+name: lint
 on: push
+jobs:
+  hlint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
 
-jobs: 
-    lint:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Install Dependencies
-              run: |
-                stack update
-                stack install hlint
-            - name: hlint files
-              run:
-                hlint . -r
-   
-                
+    - name: 'Set up HLint'
+      uses: rwe/actions-hlint-setup@v1
+      with:
+        version: '3.1.6'
+
+    - name: 'Run HLint'
+      uses: rwe/actions-hlint-run@v2
+      with:
+        path: '["src/", "app/"]'
+        fail-on: warning
