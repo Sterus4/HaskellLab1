@@ -19,7 +19,7 @@ $2^{15} = 32768$, сумма цифр этого числа равна 3 + 2 + 7
 
 [Euler15](src/Euler15.hs)
 ```Haskell
-module Euler15 (recursiveSolution, solution) where
+module Euler15 (recursiveSolution, lazySolution, solution) where
 
 
 recSol :: Integer -> Integer -> Integer
@@ -30,16 +30,38 @@ recSol m n = recSol m (n - 1) + recSol (m - 1) n
 recursiveSolution :: Integer -> Integer
 recursiveSolution n = recSol n n
 
-solution :: Int -> Integer
-solution n = 
-    pascall !! n !! n where 
-        pascall = temp : map (scanl1 (+)) pascall where
+getMiddle :: [a] -> a 
+getMiddle l1 = 
+    let cent = div (length l1) 2 in
+        l1 !! cent
+
+addLists :: (Num a) => [a] -> [a] -> [a]
+addLists = zipWith (+)
+
+pascall :: (Eq a1, Num a1, Num a2) => a1 -> [a2]
+pascall 1 = [1]
+pascall n = 
+    let prev = pascall (n - 1)
+        zeroPrev = 0 : prev
+        prevZero = prev ++ [0]
+    in 
+    addLists zeroPrev prevZero
+solution :: Integer -> Integer
+solution n = getMiddle (pascall (n * 2 + 1))
+
+
+
+lazySolution :: Int -> Integer
+lazySolution n = 
+    pascall1 !! n !! n where 
+        pascall1 = temp : map (scanl1 (+)) pascall1 where
             temp = repeat 1
+
 ```
 
 [Euler16](src/Euler16.hs)
 ```Haskell
-module Euler16 (sumOfNumeral1, sumOfNumeral2) where
+module Euler16 (sumOfNumeral1, sumOfNumeral2, sumOfNumeralTailRec, sumOfNumeralMap) where
 
 sumOfNumeral1 :: Integer -> Integer
 sumOfNumeral1 x 
@@ -47,10 +69,21 @@ sumOfNumeral1 x
     | x < 10 = x
     | otherwise = rem x 10 + sumOfNumeral1 (div x 10)
 
+sumOfNumeralTailRec :: Integer -> Integer -> Integer
+sumOfNumeralTailRec x acc
+    | x <= 0 = acc
+    | x < 10 = acc + x
+    | otherwise = sumOfNumeralTailRec (div x 10) (acc + rem x 10)
+
 sumOfNumeral2 :: Integer -> Int
 sumOfNumeral2 x =
     let s = show x in
         sum [fromEnum a - fromEnum '0' | a <- s]
+
+sumOfNumeralMap :: Integer -> Int
+sumOfNumeralMap x = 
+    sum (map toDigit (show x)) where
+        toDigit c = fromEnum c - fromEnum '0'
 ```
 
 ## Пояснения
